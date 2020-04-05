@@ -1,0 +1,38 @@
+version: "3"
+
+services:
+  webui:
+    container_name: webui
+    image: nathancooper/deep_parking:webui
+    build:
+      context: ../
+      dockerfile: ./webui-ms/Dockerfile
+    volumes:
+      - ../webui-ms:/home/webui/
+    depends_on:
+      - parking-db
+
+  parking-db:
+    container_name: parking-db
+    image: mongo
+
+  # model:
+  #   container_name: model
+  #   image: nathancooper/deep_parking:model
+  #   build:
+  #     context: ../
+  #     dockerfile: ./model-ms/Dockerfile.gpu
+  #   volumes:
+  #     - ../model-ms:/home/model/
+  #   depends_on:
+  #     - parking-db
+
+  reverse_proxy:
+    image: nathancooper/deep_parking:reverse_proxy
+    build:
+      context: ../
+      dockerfile: ./reverse_proxy/Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - webui
